@@ -5,8 +5,8 @@ import sys
 from pathlib import Path
 
 import click
-import music_library_tool as mlt
 
+from music_library_tool.libtool import compile_band_metrics
 
 
 @click.command()
@@ -18,19 +18,14 @@ def cli(lib_input, output):
         cli path_music_lib output.txt
     """
     path = Path(lib_input)
-    for album in path.iterdir():
-        if album.is_dir():
-            output.write(mlt.get_album_metrics(album))
 
-@click.command()
-@click.argument('input', type=click.File('rb'))
-@click.argument('output', type=click.File('wb'))
-def inout(input, output):
-    while True:
-        chunk = input.read(1024)
-        if not chunk:
-            break
-        output.write(chunk)
+    reports = []
+    for band in path.iterdir():
+        if band.is_dir():
+
+            reports.append('#######\n{0}'.format(compile_band_metrics(band)))
+
+    output.write('\n'.join(reports))
 
 
 if __name__ == "__main__":
