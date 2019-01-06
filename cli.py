@@ -5,8 +5,10 @@ import sys
 from pathlib import Path
 
 import click
+import mutagen
 
-from music_library_tool.libtool import compile_band_metrics
+from music_library_tool.music.primary import Band, Library
+from music_library_tool.music.analysis import get_album_with_long_track
 
 
 @click.command()
@@ -19,13 +21,30 @@ def cli(lib_input, output):
     """
     path = Path(lib_input)
 
-    reports = []
+    library = Library(path)
+
     for band in path.iterdir():
         if band.is_dir():
+            band = Band(band)
+            library.bands.append(band)
+            output.write(band.to_json())
+            output.flush()
 
-            reports.append('#######\n{0}'.format(compile_band_metrics(band)))
+    output.write("\n###############   ANOMALY  ###############\n")
 
-    output.write('\n'.join(reports))
+    for album in get_album_with_long_track(library):
+        output.write(album)
+        output.flush()
+
+
+@click.command()
+@click.argument('input_track', type=click.Path())
+def test_file(input_track):
+    path = Path(input_track)
+
+    file = mutagen.File(path)
+
+    print(file.info is None)
 
 
 if __name__ == "__main__":
