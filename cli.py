@@ -7,8 +7,11 @@ from pathlib import Path
 import click
 import mutagen
 
+
+from collections import Counter
+
 from music_library_tool.music.primary import Band, Library
-from music_library_tool.music.analysis import get_album_with_long_track
+from music_library_tool.music.analysis import compute_all_analysis
 
 
 @click.command()
@@ -32,9 +35,7 @@ def cli(lib_input, output):
 
     output.write("\n###############   ANOMALY  ###############\n")
 
-    for album in get_album_with_long_track(library):
-        output.write(album)
-        output.flush()
+    output.write(compute_all_analysis(library))
 
 
 @click.command()
