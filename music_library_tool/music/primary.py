@@ -22,9 +22,9 @@ class Library(object):
 
 
 class LibraryItemBase(metaclass=ABCMeta):
-    def __init__(self, path):
+    def __init__(self, path, name):
         self.path = str(path)
-        self.name = path.name
+        self.name = str(name)
 
     def __str__(self):
         return u'{0}:\n{1}'.format(self.__class__.__name__, self.to_json())
@@ -34,15 +34,14 @@ class LibraryItemBase(metaclass=ABCMeta):
 
     def to_json(self):
         try:
-            # return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
             return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
         except AttributeError as err:
             print(self.__dict__)
 
 
 class Band(LibraryItemBase):
-    def __init__(self, path_band):
-        super().__init__(path_band)
+    def __init__(self, path, name):
+        super(Band, self).__init__(path, name)
         self.albums = self._set_items()
 
     def _set_items(self):
@@ -51,14 +50,14 @@ class Band(LibraryItemBase):
 
         for item in path.iterdir():
             if item.is_dir():
-                items.append(Album(item, band=self.name))
+                items.append(Album(item, item.name, band=self.name))
 
         return items
 
 
 class Album(LibraryItemBase):
-    def __init__(self, path_album, band=None):
-        super().__init__(path_album)
+    def __init__(self, path, name, band=None):
+        super(Album, self).__init__(path, name)
         self.band = band
         self.tracks = self._set_items()
 
@@ -68,17 +67,18 @@ class Album(LibraryItemBase):
 
         for item in path.iterdir():
             if item.is_file() and is_music_file(item):
-                items.append(Track(item, album=self.name, band=self.band))
+                items.append(Track(item, item.name, album=self.name, band=self.band))
 
         return items
 
 
 class Track(LibraryItemBase):
-    def __init__(self, path_track, album=None, band=None):
-        super().__init__(path_track)
+    def __init__(self, path, name, album=None, band=None):
+        super(Track, self).__init__(path, name)
         self.band = band
         self.album = album
+
         # try:
-        #         #     self.id3 = mutagen.easyid3.EasyID3(self.path)
-        #         # except mutagen.id3._util.ID3NoHeaderError as err:
-        #         #     self.id3 = {}
+        #     self.id3 = mutagen.easyid3.EasyID3(self.path)
+        # except mutagen.id3._util.ID3NoHeaderError as err:
+        #     self.id3 = {}

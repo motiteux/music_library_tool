@@ -28,8 +28,9 @@ def cli(lib_input, output):
 
     for band in path.iterdir():
         if band.is_dir():
-            band = Band(band)
+            band = Band(band, band.name)
             library.bands.append(band)
+
             output.write(band.to_json())
             output.flush()
 
