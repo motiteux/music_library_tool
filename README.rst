@@ -20,7 +20,7 @@ Music Library Tool
 
 
 
-Library of tools to clean and organize music libraries
+Library of tools to analyze a set of issues in music libraries
 
 
 * Free software: MIT license
