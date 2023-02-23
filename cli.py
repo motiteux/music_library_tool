@@ -16,11 +16,11 @@ from music_library_tool.music.analysis import compute_all_analysis
 
 @click.command()
 @click.argument('lib_input', type=click.Path())
-@click.argument('output', type=click.File('w+'))
+@click.argument('output', type=click.File('w+', encoding='utf8'))
 def cli(lib_input, output):
     """Get the music library path and output metrics.
     \b
-        cli path_music_lib output.txt
+        cli path_music_lib output.json
     """
     path = Path(lib_input)
 
@@ -30,11 +30,6 @@ def cli(lib_input, output):
         if band.is_dir():
             band = Band(band, band.name)
             library.bands.append(band)
-
-            output.write(band.to_json())
-            output.flush()
-
-    output.write("\n###############   ANOMALY  ###############\n")
 
     output.write(compute_all_analysis(library))
 

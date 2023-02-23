@@ -11,7 +11,10 @@ import mutagen
 
 
 def is_music_file(track):
-    file = mutagen.File(track)
+    try:
+        file = mutagen.File(track)
+    except mutagen.MutagenError:
+        return False
     return file is not None
 
 
