@@ -10,6 +10,7 @@ from mediafile import MediaFile
 def compute_all_analysis(library):
     report_anomaly = list_albums_with_songs_longer_than_25min(library)
     report_anomaly.update(list_albums_with_less_than_5_songs(library))
+    report_anomaly.update(list_albums_with_unavailable_extensions(library))
     report_anomaly.update(list_albums_with_no_metadata(library))
 
     return json.dumps(report_anomaly)
@@ -57,6 +58,23 @@ def list_albums_with_less_than_5_songs(library):
 
     short_albums.update({"album": albums})
     return short_albums
+
+
+def list_albums_with_unavailable_extensions(library):
+    unavailable_extensions_albums = OrderedDict({"issue_type": "albums_with_unavailable_extensions"})
+    
+    list_unavailable_extensions = ["m4a", "wma"]
+
+    albums = []
+    for band in library.bands:
+        for album in band.albums:
+            for track in album.tracks:
+                if track.name[-3:] in list_unavailable_extensions:
+                    albums.append({"band": band.name, "album": album.name})
+                    break
+
+    unavailable_extensions_albums.update({"album": albums})
+    return unavailable_extensions_albums
 
 
 def list_albums_with_no_metadata(library):
